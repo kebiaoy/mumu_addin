@@ -1,0 +1,139 @@
+﻿// Connect.h : Declaration of the CConnect
+
+#pragma once
+#include "resource.h"       // main symbols
+
+using namespace AddInDesignerObjects;
+using namespace EnvDTE;
+using namespace EnvDTE80;
+using namespace Microsoft_VisualStudio_CommandBars;
+
+class CConnect;
+typedef IDispEventImpl<2, CConnect, &__uuidof(EnvDTE::_dispBuildEvents), &EnvDTE::LIBID_EnvDTE, 8, 0> BuildEventImpl;
+typedef IDispEventImpl<1, CConnect, &__uuidof(EnvDTE::_dispDebuggerEvents), &EnvDTE::LIBID_EnvDTE, 8, 0> DebuggerEventImpl;
+
+/// <summary>The object for implementing an Add-in.</summary>
+/// <seealso class='IDTExtensibility2' />
+class ATL_NO_VTABLE CConnect : 
+	public CComObjectRootEx<CComSingleThreadModel>,
+	public CComCoClass<CConnect, &CLSID_Connect>,
+	public IDispatchImpl<IDTCommandTarget, &IID_IDTCommandTarget, &LIBID_EnvDTE, 8, 0>,
+	public IDispatchImpl<_IDTExtensibility2, &IID__IDTExtensibility2, &LIBID_AddInDesignerObjects, 1, 0>,
+	public BuildEventImpl,
+	public DebuggerEventImpl
+{
+public:
+	/// <summary>Implements the constructor for the Add-in object. Place your initialization code within this method.</summary>
+	CConnect()
+	{
+	}
+
+DECLARE_REGISTRY_RESOURCEID(IDR_ADDIN)
+DECLARE_NOT_AGGREGATABLE(CConnect)
+
+BEGIN_COM_MAP(CConnect)
+	COM_INTERFACE_ENTRY(IDTExtensibility2)
+	COM_INTERFACE_ENTRY(IDTCommandTarget)
+	COM_INTERFACE_ENTRY2(IDispatch, IDTExtensibility2)
+END_COM_MAP()
+
+
+
+	DECLARE_PROTECT_FINAL_CONSTRUCT()
+
+	HRESULT FinalConstruct()
+	{
+		return S_OK;
+	}
+	
+	void FinalRelease() 
+	{
+	}
+
+public:
+//IDTExtensibility2 implementation:
+
+	/// <summary>Implements the OnConnection method of the IDTExtensibility2 interface. Receives notification that the Add-in is being loaded.</summary>
+	/// <param term='application'>Root object of the host application.</param>
+	/// <param term='connectMode'>Describes how the Add-in is being loaded.</param>
+	/// <param term='addInInst'>Object representing this Add-in.</param>
+	/// <seealso class='IDTExtensibility2' />
+	STDMETHOD(OnConnection)(IDispatch * Application, ext_ConnectMode ConnectMode, IDispatch *AddInInst, SAFEARRAY **custom);
+
+	/// <summary>Implements the OnDisconnection method of the IDTExtensibility2 interface. Receives notification that the Add-in is being unloaded.</summary>
+	/// <param term='disconnectMode'>Describes how the Add-in is being unloaded.</param>
+	/// <param term='custom'>Array of parameters that are host application specific.</param>
+	/// <seealso class='IDTExtensibility2' />
+	STDMETHOD(OnDisconnection)(ext_DisconnectMode RemoveMode, SAFEARRAY **custom );
+
+	/// <summary>Implements the OnAddInsUpdate method of the IDTExtensibility2 interface. Receives notification when the collection of Add-ins has changed.</summary>
+	/// <param term='custom'>Array of parameters that are host application specific.</param>
+	/// <seealso class='IDTExtensibility2' />	
+	STDMETHOD(OnAddInsUpdate)(SAFEARRAY **custom );
+
+	/// <summary>Implements the OnStartupComplete method of the IDTExtensibility2 interface. Receives notification that the host application has completed loading.</summary>
+	/// <param term='custom'>Array of parameters that are host application specific.</param>
+	/// <seealso class='IDTExtensibility2' />
+	STDMETHOD(OnStartupComplete)(SAFEARRAY **custom );
+
+	/// <summary>Implements the OnBeginShutdown method of the IDTExtensibility2 interface. Receives notification that the host application is being unloaded.</summary>
+	/// <param term='custom'>Array of parameters that are host application specific.</param>
+	/// <seealso class='IDTExtensibility2' />
+	STDMETHOD(OnBeginShutdown)(SAFEARRAY **custom );
+	
+//IDTCommandTarget implementation:
+
+	/// <summary>Implements the QueryStatus method of the IDTCommandTarget interface. This is called when the command's availability is updated</summary>
+	/// <param term='commandName'>The name of the command to determine state for.</param>
+	/// <param term='neededText'>Text that is needed for the command.</param>
+	/// <param term='status'>The state of the command in the user interface.</param>
+	/// <param term='commandText'>Text requested by the neededText parameter.</param>
+	/// <seealso class='Exec' />
+	STDMETHOD(QueryStatus)(BSTR CmdName, vsCommandStatusTextWanted NeededText, vsCommandStatus *StatusOption, VARIANT *CommandText);
+
+	/// <summary>Implements the Exec method of the IDTCommandTarget interface. This is called when the command is invoked.</summary>
+	/// <param term='commandName'>The name of the command to execute.</param>
+	/// <param term='executeOption'>Describes how the command should be run.</param>
+	/// <param term='varIn'>Parameters passed from the caller to the command handler.</param>
+	/// <param term='varOut'>Parameters passed from the command handler to the caller.</param>
+	/// <param term='handled'>Informs the caller if the command was handled or not.</param>
+	/// <seealso class='Exec' />
+	STDMETHOD(Exec)(BSTR CmdName, vsCommandExecOption ExecuteOption, VARIANT *VariantIn, VARIANT *VariantOut, VARIANT_BOOL *Handled);
+public:
+	BEGIN_SINK_MAP(CConnect)
+		SINK_ENTRY_EX(1, __uuidof(EnvDTE::_dispDebuggerEvents), 1, OnEnterRunMode)
+		SINK_ENTRY_EX(1, __uuidof(EnvDTE::_dispDebuggerEvents), 2, OnEnterDesignMode)
+		SINK_ENTRY_EX(1, __uuidof(EnvDTE::_dispDebuggerEvents), 3, OnEnterBreakMode)
+		SINK_ENTRY_EX(1, __uuidof(EnvDTE::_dispDebuggerEvents), 4, OnExceptionThrown)
+		SINK_ENTRY_EX(1, __uuidof(EnvDTE::_dispDebuggerEvents), 5, OnExceptionNotHandled)
+		SINK_ENTRY_EX(1, __uuidof(EnvDTE::_dispDebuggerEvents), 6, OnContextChanged)
+
+		SINK_ENTRY_EX(2, __uuidof(EnvDTE::_dispBuildEvents), 3, OnBuildBegin)
+		SINK_ENTRY_EX(2, __uuidof(EnvDTE::_dispBuildEvents), 4, OnBuildDone)
+		SINK_ENTRY_EX(2, __uuidof(EnvDTE::_dispBuildEvents), 5, OnBuildProjConfigBegin)
+		SINK_ENTRY_EX(2, __uuidof(EnvDTE::_dispBuildEvents), 6, OnBuildProjConfigDone)
+	END_SINK_MAP()
+
+	void __stdcall OnEnterRunMode(EnvDTE::dbgEventReason Reason);
+	void __stdcall OnEnterDesignMode(EnvDTE::dbgEventReason Reason);
+	void __stdcall OnEnterBreakMode(EnvDTE::dbgEventReason Reason, EnvDTE::dbgExecutionAction* ExecutionAction);
+	void __stdcall OnExceptionThrown(BSTR ExceptionType, BSTR Name, long Code, BSTR Description, EnvDTE::dbgExceptionAction* ExceptionAction);
+	void __stdcall OnExceptionNotHandled(BSTR ExceptionType, BSTR Name, long Code, BSTR Description, EnvDTE::dbgExceptionAction* ExceptionAction);
+	void __stdcall OnContextChanged(EnvDTE::Process* NewProcess, EnvDTE::Program* NewProgram, EnvDTE::Thread* NewThread, EnvDTE::StackFrame* NewStackFrame);
+
+	//[id(0x00000003)]
+	void __stdcall OnBuildBegin(EnvDTE::vsBuildScope Scope, EnvDTE::vsBuildAction Action);
+	//[id(0x00000004)]
+	void __stdcall OnBuildDone(EnvDTE::vsBuildScope Scope, EnvDTE::vsBuildAction Action);
+	//[id(0x00000005)]
+	void __stdcall OnBuildProjConfigBegin(BSTR Project, BSTR ProjectConfig, BSTR Platform, BSTR SolutionConfig);
+	//[id(0x00000006)]
+	void __stdcall OnBuildProjConfigDone(BSTR Project, BSTR ProjectConfig, BSTR Platform, BSTR SolutionConfig, VARIANT_BOOL Success);
+private:
+	CComPtr<DTE2> m_pDTE;
+	CComPtr<AddIn> m_pAddInInstance;
+	CComPtr<EnvDTE::_DebuggerEvents> m_pDebugEvents;
+	CComPtr<EnvDTE::_BuildEvents> m_pBuildEvents;
+};
+
+OBJECT_ENTRY_AUTO(__uuidof(Connect), CConnect)
