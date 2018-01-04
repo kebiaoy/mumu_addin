@@ -17,16 +17,19 @@ STDMETHODIMP CConnect::OnConnection(IDispatch *pApplication, ext_ConnectMode Con
 	HRESULT hr = S_OK;
 	pApplication->QueryInterface(__uuidof(DTE2), (LPVOID*)&m_pDTE);
 	pAddInInst->QueryInterface(__uuidof(AddIn), (LPVOID*)&m_pAddInInstance);
-	CComPtr<EnvDTE::Events> pEvents;
-	IfFailGo(m_pDTE->get_Events(&pEvents));
+	if (ConnectMode == ext_ConnectMode::ext_cm_Startup)
+	{
+		CComPtr<EnvDTE::Events> pEvents;
+		IfFailGo(m_pDTE->get_Events(&pEvents));
 
-	// Get DTE.BuildEvents interface
-	IfFailGo(pEvents->get_DebuggerEvents((EnvDTE::_DebuggerEvents**)&m_pDebugEvents));
-	IfFailGo(pEvents->get_BuildEvents((EnvDTE::_BuildEvents**)&m_pBuildEvents));
+		// Get DTE.BuildEvents interface
+		IfFailGo(pEvents->get_DebuggerEvents((EnvDTE::_DebuggerEvents**)&m_pDebugEvents));
+		IfFailGo(pEvents->get_BuildEvents((EnvDTE::_BuildEvents**)&m_pBuildEvents));
 
-	// Sink the BuildEvents
-	IfFailGo(DebuggerEventImpl::DispEventAdvise((IUnknown*)m_pDebugEvents.p));
-	IfFailGo(BuildEventImpl::DispEventAdvise((IUnknown*)m_pBuildEvents.p));
+		// Sink the BuildEvents
+		IfFailGo(DebuggerEventImpl::DispEventAdvise((IUnknown*)m_pDebugEvents.p));
+		IfFailGo(BuildEventImpl::DispEventAdvise((IUnknown*)m_pBuildEvents.p));
+	}
 Error:
 	return hr;
 }
