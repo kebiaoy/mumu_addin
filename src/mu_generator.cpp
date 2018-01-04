@@ -18,10 +18,11 @@ mu_generator::~mu_generator()
 
 void mu_generator::generate()
 {
+	if (!m_pProject)
+		return;
 	for (int i = 0; i < m_pProject->get_source_count(); ++i)
 	{
 		mu_source_ptr pSource = m_pProject->get_source(i);
-
 		FILETIME srcWiteTime;
 		mu_pathutil::get_file_write_time(pSource->get_file_path(), &srcWiteTime);
 		std::ofstream file;
@@ -202,7 +203,6 @@ void mu_generator::generate()
 			file.close();
 			mu_pathutil::set_file_write_time(strFileName.data(), &srcWiteTime);
 		}
-
 	}
 
 }
