@@ -443,3 +443,12 @@ std::string mu_source::get_string_data()
 	}
 	return retStr;
 }
+
+std::string mu_source::get_file_name()
+{
+	char buf[MAX_PATH] = "";
+	memcpy(buf, m_strSourceFile.data(), m_strSourceFile.size());
+	PathStripPath(buf);
+	PathRemoveExtension(buf);
+	return buf;
+}

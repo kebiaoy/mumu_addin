@@ -50,7 +50,7 @@ void mu_generator::generate()
 					CreateDirectory(strProjectPath.data(), NULL);
 				}
 				PathRelativePathTo(strIncludePath, strProjectPath.data(), FILE_ATTRIBUTE_DIRECTORY, pSource->get_file_path().data(), 0);
-				strFileName = strProjectPath + "\\" + "mu_" + pClass->get_name() + ".cpp";
+				strFileName = strProjectPath + "\\" + "mu_" + pSource->get_file_name() + ".cpp";
 				FILETIME dstWiteTime;
 				if (mu_pathutil::get_file_write_time(strFileName.data(), &dstWiteTime))
 				{

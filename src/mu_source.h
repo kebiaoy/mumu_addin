@@ -13,6 +13,7 @@ public:
 	std::string get_file_path();
 	int get_string_data_count();
 	std::string get_string_data();
+	std::string get_file_name();
 private:
 	enum class_state
 	{

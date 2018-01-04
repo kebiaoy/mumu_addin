@@ -23,15 +23,7 @@ void mu_project::init()
 	EnvDTE::ProjectItems* pProjectItems;
 	m_pProjectImpl->get_ProjectItems(&pProjectItems);
 	assert(pProjectItems != NULL);
-
-
-	pProjectItems->AddFolder(m_strFilterName, CComBSTR(EnvDTE::vsProjectItemKindVirtualFolder), &m_pFilterItem);
 	pProjectItems->get_Count(&nItemCount);
-	if (FAILED(m_pProjectImpl->Save(NULL)))
-	{
-		int a;
-		a = 5;
-	}
 	for (int i = 1; i <= nItemCount; ++i)
 	{
 		EnvDTE::ProjectItem* pItem;
@@ -98,6 +90,14 @@ std::string mu_project::get_project_path()
 
 void mu_project::add_generate_file(std::string strFileName)
 {
+	if(!m_pFilterItem)
+	{
+		EnvDTE::ProjectItems* pProjectItems;
+		m_pProjectImpl->get_ProjectItems(&pProjectItems);
+		assert(pProjectItems != NULL);
+		pProjectItems->AddFolder(m_strFilterName, CComBSTR(EnvDTE::vsProjectItemKindVirtualFolder), &m_pFilterItem);
+		m_pProjectImpl->Save(NULL);
+	}
 	if (m_pFilterItem)
 	{
 		long nItemCount = 0;
