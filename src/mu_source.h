@@ -14,6 +14,7 @@ public:
 	int get_string_data_count();
 	std::string get_string_data();
 	std::string get_file_name();
+	bool IsUseStdAfx();
 private:
 	enum class_state
 	{
@@ -56,6 +57,7 @@ private:
 	std::string m_strArgType;
 	std::string m_strVariable;
 	std::vector<std::string> m_strStringData;
+	bool m_bIsUseStdAfx;
 };
 
 typedef std::shared_ptr<mu_source> mu_source_ptr;

@@ -5,6 +5,7 @@
 
 mu_source::mu_source(std::string strSourceFile) :m_strSourceFile(strSourceFile),
 m_nClassState(class_state::class_idel), m_nAnalysisState(analysis_state::analysis_idel)
+, m_bIsUseStdAfx(false)
 {
 	init();
 }
@@ -24,6 +25,11 @@ void mu_source::init()
 	const char* strData = strContent.data();
 	std::string strKeyWord;
 	size_t nToalLength = strContent.length();
+	if(get_file_name()=="ChatRoomSelectColorUI")
+	{
+		int a;
+		a = 5;
+	}
 	for (size_t i = 0; i < nToalLength; ++i)
 	{
 		char cNext = -1;
@@ -98,6 +104,10 @@ void mu_source::init()
 
 void mu_source::get_key_word(std::string& key, const char* data, size_t& cur_pos, size_t& total_size)
 {
+	if (key == "MUMUUSESTDAFX")
+	{
+		m_bIsUseStdAfx = true;
+	}
 	if (key.empty())
 	{
 		return;
@@ -153,11 +163,11 @@ void mu_source::get_key_word(std::string& key, const char* data, size_t& cur_pos
 							{
 								if (key.find(',') != std::string::npos)
 								{
-									key.erase(key.find(','));
+									key.erase(key.find(','), 1);
 								}
 								m_listClasses.back()->set_parent_name(key);
 							}
-							m_nAnalysisState = mu_source::get_class_name;
+							m_nAnalysisState = mu_source::analysis_idel;
 							break;
 						default:
 							break;
@@ -166,16 +176,28 @@ void mu_source::get_key_word(std::string& key, const char* data, size_t& cur_pos
 				case mu_source::get_class_name:
 					if (key.find(':') != std::string::npos)
 					{
-						key.erase(key.find(':'));
+						if (key.back() != ':' && key.length()>1)
+						{
+							m_nParentState = mu_source::parent_state_start;
+						}
+						if ( key.front() != ':' && key.length()>1)
+						{
+							size_t pos = key.find(':');
+							std::string strClassName = key.substr(0, pos);
+							m_listClasses.back()->set_name(strClassName);
+						}
 						m_nAnalysisState = mu_source::get_parent_class;
+						break;
 					}
-					if (!m_listClasses.empty() && m_listClasses.back()->get_name().empty())
-					{
-						m_listClasses.back()->set_name(key);
-					}
-
+					
 					if (key.find('{') != std::string::npos)
 					{
+						if (key.front() != '{')
+						{
+							size_t pos = key.find('{');
+							std::string strClassName = key.substr(0, pos);
+							m_listClasses.back()->set_name(strClassName);
+						}
 						m_nAnalysisState = mu_source::analysis_idel;
 					}
 					else if (key.find(';') != std::string::npos)
@@ -185,6 +207,10 @@ void mu_source::get_key_word(std::string& key, const char* data, size_t& cur_pos
 							m_listClasses.pop_back();
 						}
 						m_nClassState = class_state::class_idel;
+					}
+					else
+					{
+						m_listClasses.back()->set_name(key);
 					}
 					break;
 				case mu_source::get_slot:
@@ -451,4 +477,9 @@ std::string mu_source::get_file_name()
 	PathStripPath(buf);
 	PathRemoveExtension(buf);
 	return buf;
+}
+
+bool mu_source::IsUseStdAfx()
+{
+	return m_bIsUseStdAfx;
 }

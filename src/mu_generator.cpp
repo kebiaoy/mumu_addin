@@ -60,6 +60,10 @@ void mu_generator::generate()
 						break;
 					}
 				}
+				if(pSource->IsUseStdAfx())
+				{
+					strFunc << "#include \"StdAfx.h\"\n";
+				}
 				strFunc << "#include \"" << strIncludePath << "\"\n#include <string>\n";
 				m_pProject->add_generate_file(strFileName);
 				std::string stdStringData = pSource->get_string_data();
